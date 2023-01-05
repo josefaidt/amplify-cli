@@ -55,6 +55,9 @@ const runPackageManager = (cwd: string, buildType?: BuildType, scriptName?: stri
       cwd,
       stdio: 'pipe',
       encoding: 'utf-8',
+      env: {
+        NODE_ENV: buildType === BuildType.PROD ? 'production' : 'development',
+      },
     });
   } catch (error) {
     if (error.code === 'ENOENT') {
