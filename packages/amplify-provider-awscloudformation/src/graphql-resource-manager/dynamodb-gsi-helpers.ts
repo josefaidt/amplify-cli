@@ -38,6 +38,7 @@ export const getGSIDetails = (indexName: string, table: DynamoDB.Table): GSIReco
 
     return { gsi: addedGSI, attributeDefinition };
   }
+  return undefined;
 };
 
 /**
@@ -108,10 +109,13 @@ export const removeGSI = (indexName: string, table: DynamoDB.Table): DynamoDB.Ta
 
   const removedIndices = _.remove(gsis, { IndexName: indexName });
   assertNotIntrinsicFunction(removedIndices);
-  const currentKeySchemas = gsis.reduce((acc, gsi) => {
+  const gsiKeySchemas: Array<KeySchema> = gsis.reduce((acc, gsi) => {
     acc.push(...(gsi.KeySchema as Array<KeySchema>));
     return acc;
   }, []);
+
+  // Add the KeySchema property on table to the currentKeySchemas
+  const currentKeySchemas = _.union(gsiKeySchemas, (updatedTable?.Properties?.KeySchema as Array<KeySchema>) || []);
 
   // Remove the property as it does not have any child
   if (gsis.length == 0) {

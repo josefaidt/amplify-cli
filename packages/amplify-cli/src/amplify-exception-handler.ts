@@ -5,8 +5,9 @@ import {
   AmplifyFault,
   executeHooks,
   HooksMeta,
+  isWindowsPlatform,
 } from 'amplify-cli-core';
-import { logger } from 'amplify-cli-logger';
+import { getAmplifyLogger } from 'amplify-cli-logger';
 import { AmplifyPrinter, printer } from 'amplify-prompts';
 import { reportError } from './commands/diagnose';
 import { isHeadlessCommand } from './context-manager';
@@ -68,14 +69,29 @@ export const handleException = async (exception: unknown): Promise<void> => {
   );
 
   await executeSafely(
-    () => logger.logError({
+    () => getAmplifyLogger().logError({
       message: deepestException.message,
       error: deepestException,
     }),
     'Failed to log error',
   );
 
-  process.exitCode = 1;
+  process.exit(1);
+};
+
+/**
+ * Handle rejected promises that weren't caught or awaited anywhere in the code.
+ */
+export const handleUnhandledRejection = (reason: Error | $TSAny): void => {
+  if (reason instanceof Error) {
+    throw reason;
+  } else if (reason !== null && typeof reason === 'string') {
+    throw new Error(reason);
+  } else if (reason !== null) {
+    throw new Error(JSON.stringify(reason));
+  } else {
+    throw new Error('Unhandled promise rejection');
+  }
 };
 
 const getDeepestAmplifyException = (amplifyException: AmplifyException): AmplifyException => {
@@ -159,11 +175,17 @@ const nodeErrorToAmplifyException = (err: NodeJS.ErrnoException): AmplifyExcepti
   nodeErrorTypeToAmplifyExceptionType(err), {
     message: err.message,
     resolution: mapNodeErrorToResolution(err),
+    code: err.code,
   }, err,
 );
 
 const nodeErrorTypeToAmplifyExceptionType = (__err: NodeJS.ErrnoException): AmplifyFaultType => 'UnknownNodeJSFault';
-const mapNodeErrorToResolution = (__err: NodeJS.ErrnoException): string => `Please report this issue at https://github.com/aws-amplify/amplify-cli/issues and include the project identifier from: 'amplify diagnose --send-report'`;
+const mapNodeErrorToResolution = (err: NodeJS.ErrnoException): string => {
+  if (!isWindowsPlatform && err.code === 'EACCES' && err.message.includes('/.amplify/')) {
+    return `Try running 'sudo chown -R $(whoami):$(id -gn) ~/.amplify' to fix this`;
+  }
+  return `Please report this issue at https://github.com/aws-amplify/amplify-cli/issues and include the project identifier from: 'amplify diagnose --send-report'`;
+};
 
 const genericErrorTypeToAmplifyExceptionType = (__err: Error): AmplifyFaultType => 'UnknownFault';
 const mapGenericErrorToResolution = (__err: Error): string => `Please report this issue at https://github.com/aws-amplify/amplify-cli/issues and include the project identifier from: 'amplify diagnose --send-report'`;
