@@ -36,7 +36,7 @@ async function publish(context, service, args) {
     const { doSkipBuild } = args || {};
     await hosting.publish(context, doSkipBuild, true);
   } catch (err) {
-    if (err.name === 'ValidationError') {
+    if (err?.name === 'ValidationError') {
       context.print.error(err.message);
     } else {
       throw err;
