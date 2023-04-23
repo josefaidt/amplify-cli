@@ -114,16 +114,29 @@
 }
 
 .submit {
-  color: hsl(var(--color-primary));
-  background-color: hsla(var(--color-neutral), var(--alpha-background-light));
-  border: none;
+  color: hsla(var(--color-neutral), 1);
+  --background-color: hsla(var(--color-neutral), var(--alpha-background-light));
+  background-color: var(--background-color);
+  border: 1px solid transparent;
+  --border-color: transparent;
+  border-color: var(--border-color);
   padding: var(--px-10);
   border-radius: var(--border-radius-4);
   cursor: pointer;
 }
 
 .submit:hover {
-  background-color: hsla(var(--color-neutral), var(--alpha-background-medium));
+  --background-color: hsla(var(--color-neutral), var(--alpha-background-medium));
+}
+
+.submit:focus {
+  /* outline: hsla(var(--color-primary), var(--alpha-background-heavy)) auto 1px; */
+}
+
+.submit:active {
+  --border-color: hsla(var(--color-primary), var(--alpha-background-medium));
+  /* --background-color: hsl(var(--color-base)); */
+  --background-color: hsla(var(--color-primary), var(--alpha-background-medium));
 }
 
 .submit:disabled {

@@ -4,6 +4,9 @@ import { getDefaultAuthProvider } from '@/support/get-default-auth-provider';
 import type { PropsWithChildren } from 'react';
 import type { AmplifyGraphQLAuthProviderType, AmplifyGraphQLConfigCredentials } from '@/support/types';
 
+/**
+ * Amplify Auth Actions to perform against state
+ */
 export const AMPLIFY_AUTH_ACTION = {
   UPDATE: 'UPDATE',
   UPDATE_PROVIDER: 'UPDATE_PROVIDER',
@@ -52,7 +55,7 @@ function reducer(state: AmplifyGraphQLAuthState, action: AmplifyAuthAction): Amp
         ...state,
         credentials: {
           ...state.credentials,
-          ...action.payload,
+          ...Object.fromEntries(Object.entries(action.payload).filter(([, value]) => value !== undefined)),
         },
       };
     }
@@ -72,9 +75,6 @@ type AmplifyAuthProviderProps = PropsWithChildren<{
 export function AmplifyAuthProvider(props: AmplifyAuthProviderProps) {
   const { children, initial } = props;
   const [auth, dispatch] = useReducer(reducer, initial || DEFAULT_AUTH_STATE);
-  useEffect(() => {
-    console.log({ auth });
-  }, [auth]);
   return (
     <AmplifyAuthContextState.Provider value={auth}>
       <AmplifyAuthContextDispatch.Provider value={dispatch}>{children}</AmplifyAuthContextDispatch.Provider>

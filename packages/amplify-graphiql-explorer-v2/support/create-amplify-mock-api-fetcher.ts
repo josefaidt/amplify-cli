@@ -28,6 +28,9 @@ export function createAmplifyMockApiFetcher(
       });
     }
     case AUTH_PROVIDER_TYPE.AMAZON_COGNITO_USER_POOLS: {
+      if (!credentials.cognitoJwtToken) {
+        throw new Error('Missing Cognito JWT token');
+      }
       return createGraphiQLFetcher({
         url,
         headers: {
@@ -37,8 +40,21 @@ export function createAmplifyMockApiFetcher(
       });
     }
     /** @todo OIDC and IAM */
-    case AUTH_PROVIDER_TYPE.OPENID_CONNECT:
-    case AUTH_PROVIDER_TYPE.AWS_IAM:
+    case AUTH_PROVIDER_TYPE.OPENID_CONNECT: {
+      if (!credentials.oidcJwtToken) {
+        throw new Error('Missing OIDC JWT token');
+      }
+      return createGraphiQLFetcher({
+        url,
+        headers: {
+          Authorization: `Bearer ${credentials.oidcJwtToken}`,
+        },
+        fetch,
+      });
+    }
+    case AUTH_PROVIDER_TYPE.AWS_IAM: {
+      throw new Error('Unsupported AWS IAM authentication type');
+    }
     default: {
       throw new Error('Unsupported default authentication type');
     }

@@ -1,16 +1,27 @@
 import { useRef } from 'react';
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 import { CREDENTIAL_NAMES } from '@/support/constants';
+import { useAmplifyApiConfig } from '@/support/use-amplify-api-config';
 import { useAmplifyAuth } from './use-amplify-auth';
 import styles from './AmplifyAuthPlugin.module.css';
-import type { AmplifyGraphQLAuthProviderConfig, AmplifyGraphQLAuthProviderType, AmplifyGraphQLConfigCredentials } from '@/support/types';
+import type { AmplifyGraphQLConfig, AmplifyGraphQLAuthProviderType, AmplifyGraphQLConfigCredentials } from '@/support/types';
 
 export type AmplifyAuthPluginProps = {
-  providers: AmplifyGraphQLAuthProviderConfig[];
-  credentials: AmplifyGraphQLConfigCredentials;
+  // ...
 };
 
-export function AmplifyAuthPlugin(props: AmplifyAuthPluginProps) {
-  const { providers, credentials } = props;
+const credentialSchema = zfd.formData({
+  ...Object.keys(CREDENTIAL_NAMES).reduce((acc, key) => {
+    return {
+      ...acc,
+      [key]: zfd.text(z.string().optional()),
+    };
+  }, {}),
+});
+
+export function AmplifyAuthPlugin(props?: AmplifyAuthPluginProps) {
+  const [apiConfig] = useAmplifyApiConfig();
   const [amplifyAuth, dispatchAmplifyAuth] = useAmplifyAuth();
   const formAuthProviderRef = useRef<HTMLFormElement>(null);
   const formAuthCredentialsRef = useRef<HTMLFormElement>(null);
@@ -25,7 +36,7 @@ export function AmplifyAuthPlugin(props: AmplifyAuthPluginProps) {
   const handleOnAuthCredentialsSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const credentials = Object.fromEntries(formData.entries()) as AmplifyGraphQLConfigCredentials;
+    const credentials = credentialSchema.parse(formData);
     dispatchAmplifyAuth({
       type: 'UPDATE_CREDENTIALS',
       payload: credentials,
@@ -41,7 +52,7 @@ export function AmplifyAuthPlugin(props: AmplifyAuthPluginProps) {
       </p> */}
       <form className={styles.form} ref={formAuthProviderRef}>
         {/* <h3>Choose an active authentication provider</h3> */}
-        {providers.map(({ name, type, isEnabled }) => (
+        {apiConfig.providers.map(({ name, type, isEnabled }) => (
           <div key={type} className={styles.container}>
             <input
               className={styles.radio}
@@ -62,7 +73,7 @@ export function AmplifyAuthPlugin(props: AmplifyAuthPluginProps) {
       <hr className={styles.hr} />
       <form className={styles.form} ref={formAuthCredentialsRef} onSubmit={handleOnAuthCredentialsSubmit}>
         <h3>Credentials</h3>
-        {Object.entries(credentials).map(([key, value]) => (
+        {Object.entries(amplifyAuth.credentials).map(([key, value]) => (
           <div key={key} className={styles.credentials}>
             <label htmlFor={key} className={styles.label}>
               {CREDENTIAL_NAMES[key as keyof AmplifyGraphQLConfigCredentials]}

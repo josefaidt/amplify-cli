@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { GraphiQL } from 'graphiql';
 import { useExplorerPlugin } from '@graphiql/plugin-explorer';
 import { useAmplifyAuthPlugin } from '@/plugins/graphiql-plugin-amplify-auth';
@@ -17,13 +17,10 @@ export function Editor(props: EditorProps) {
   const [amplifyAuth] = useAmplifyAuth();
   const [query, setQuery] = useState('');
 
-  const fetcher = createAmplifyMockApiFetcher(amplifyAuth.provider, amplifyAuth.credentials);
+  const fetcher = useMemo(() => createAmplifyMockApiFetcher(amplifyAuth.provider, amplifyAuth.credentials), [amplifyAuth]);
 
   // create Amplify auth plugin for GraphiQL
-  const amplifyAuthPlugin = useAmplifyAuthPlugin({
-    providers: amplifyApiConfig.providers,
-    credentials: amplifyApiConfig.credentials,
-  });
+  const amplifyAuthPlugin = useAmplifyAuthPlugin();
   // create Explorer plugin for GraphiQL
   const explorerPlugin = useExplorerPlugin({
     query,

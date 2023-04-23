@@ -4,7 +4,7 @@ import { GraphiQLPlugin } from '@graphiql/react';
 import { AmplifyAuthPlugin } from './AmplifyAuthPlugin';
 import type { AmplifyAuthPluginProps } from './AmplifyAuthPlugin';
 
-export function useAmplifyAuthPlugin(props: AmplifyAuthPluginProps) {
+export function useAmplifyAuthPlugin(props?: AmplifyAuthPluginProps) {
   const propsRef = useRef(props);
   propsRef.current = props;
 
