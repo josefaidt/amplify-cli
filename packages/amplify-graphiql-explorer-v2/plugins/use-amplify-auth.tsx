@@ -1,5 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useReducer } from 'react';
 import { DEFAULT_API_CONFIG } from '@/support/constants';
+import { getDefaultAuthProvider } from '@/support/get-default-auth-provider';
+import type { AmplifyGraphQLAuthProviderType, AmplifyGraphQLConfigCredentials } from '@/support/types';
 
 export const AMPLIFY_AUTH_ACTION = {
   UPDATE: 'UPDATE',
@@ -11,13 +13,13 @@ type AmplifyAuthAction = {
 };
 
 type AmplifyGraphQLAuthState = {
-  provider: AmplifyGraphQLAuthProvider;
-  credentials: unknown;
+  provider: AmplifyGraphQLAuthProviderType;
+  credentials: AmplifyGraphQLConfigCredentials;
 };
 
 const DEFAULT_AUTH_STATE: AmplifyGraphQLAuthState = {
-  provider: DEFAULT_API_CONFIG.defaultAuthenticationType.authenticationType,
-  credentials: DEFAULT_API_CONFIG.defaultAuthenticationType.apiKey,
+  provider: getDefaultAuthProvider(DEFAULT_API_CONFIG.providers).type,
+  credentials: DEFAULT_API_CONFIG.credentials,
 };
 
 const AmplifyAuthContextState = createContext<AmplifyGraphQLAuthState>(DEFAULT_AUTH_STATE);

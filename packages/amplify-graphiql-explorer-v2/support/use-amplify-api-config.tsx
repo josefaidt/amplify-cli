@@ -2,6 +2,7 @@
 import { createContext, useContext, useReducer } from 'react';
 import { DEFAULT_API_CONFIG } from '@/support/constants';
 import type { PropsWithChildren } from 'react';
+import type { AmplifyGraphQLConfig } from './types';
 
 export const API_CONFIG_ACTION = {
   UPDATE: 'UPDATE',
@@ -9,15 +10,15 @@ export const API_CONFIG_ACTION = {
 
 type AmplifyApiConfigAction = {
   type: typeof API_CONFIG_ACTION.UPDATE;
-  payload: Partial<AmplifyAppSyncSimulatorApiConfig>;
+  payload: Partial<AmplifyGraphQLConfig>;
 };
 
-const AmplifyApiConfigContextState = createContext<AmplifyAppSyncSimulatorApiConfig>(DEFAULT_API_CONFIG);
+const AmplifyApiConfigContextState = createContext<AmplifyGraphQLConfig>(DEFAULT_API_CONFIG);
 const AmplifyApiConfigContextDispatch = createContext<React.Dispatch<AmplifyApiConfigAction>>(() => {
   throw new Error('AmplifyApiConfigContextDispatch not initialized');
 });
 
-function reducer(state: AmplifyAppSyncSimulatorApiConfig, action: AmplifyApiConfigAction) {
+function reducer(state: AmplifyGraphQLConfig, action: AmplifyApiConfigAction) {
   switch (action.type) {
     case API_CONFIG_ACTION.UPDATE: {
       return { ...state, ...action.payload };
@@ -29,7 +30,7 @@ function reducer(state: AmplifyAppSyncSimulatorApiConfig, action: AmplifyApiConf
 }
 
 type AmplifyApiConfigProviderProps = PropsWithChildren<{
-  initial?: AmplifyAppSyncSimulatorApiConfig;
+  initial?: AmplifyGraphQLConfig;
 }>;
 
 /**

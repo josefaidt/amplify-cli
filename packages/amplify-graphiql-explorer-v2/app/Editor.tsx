@@ -17,12 +17,11 @@ export function Editor(props: EditorProps) {
   const [amplifyAuth] = useAmplifyAuth();
   const [query, setQuery] = useState('');
 
-  const fetcher = createAmplifyMockApiFetcher(amplifyApiConfig.defaultAuthenticationType.authenticationType, amplifyApiConfig.apiKey);
+  const fetcher = createAmplifyMockApiFetcher(amplifyAuth.provider, amplifyAuth.credentials);
 
   // create Amplify auth plugin for GraphiQL
   const amplifyAuthPlugin = useAmplifyAuthPlugin({
-    defaultAuthProvider: amplifyApiConfig.defaultAuthenticationType.authenticationType,
-    additionalAuthProviders: amplifyApiConfig.additionalAuthenticationProviders.map((provider) => provider.authenticationType),
+    providers: amplifyApiConfig.providers,
   });
   // create Explorer plugin for GraphiQL
   const explorerPlugin = useExplorerPlugin({

@@ -1,6 +1,7 @@
 import { AmplifyGraphiQL } from './AmplifyGraphiQL';
-import { AUTH_PROVIDER } from '@/support/constants';
+import { AUTH_PROVIDER_TYPE, AUTH_PROVIDER_NAME } from '@/support/constants';
 import styles from './page.module.css';
+import type { AmplifyAppSyncSimulatorApiConfig, AmplifyGraphQLConfig, AmplifyGraphQLAuthProviderType } from '@/support/types';
 
 function transformConfig(config: AmplifyAppSyncSimulatorApiConfig): AmplifyGraphQLConfig {
   const {
@@ -16,14 +17,17 @@ function transformConfig(config: AmplifyAppSyncSimulatorApiConfig): AmplifyGraph
 
   return {
     name,
-    providers: Object.keys(AUTH_PROVIDER).map((name) => {
+    providers: Object.keys(AUTH_PROVIDER_TYPE).map((type) => {
       const isEnabled = [
         defaultAuthenticationType.authenticationType,
         ...additionalAuthenticationProviders.map((provider: { authenticationType: string }) => provider.authenticationType),
-      ].includes(name);
+      ].includes(type);
       return {
-        name: name as AmplifyGraphQLAuthProvider,
-        isDefault: name === defaultAuthenticationType.authenticationType,
+        /** @todo remove typecasting in favor of proper typing */
+        type: type as AmplifyGraphQLAuthProviderType,
+        /** @todo remove typecasting in favor of proper typing */
+        name: AUTH_PROVIDER_NAME[type as keyof typeof AUTH_PROVIDER_TYPE],
+        isDefault: type === defaultAuthenticationType.authenticationType,
         isEnabled,
       };
     }),
@@ -44,11 +48,10 @@ async function getApiConfig(): Promise<AmplifyGraphQLConfig> {
   const response = await fetch(`${process.env.MOCK_HOST}/api-config`);
   if (!response.ok) {
     // This will activate the closest `error.js` Error Boundary
-    throw new Error(`Failed to fetch API Info: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to fetch API config: ${response.status} ${response.statusText}`);
   }
-  // const config = await response.json();
-  // return transformConfig(config);
-  return response.json();
+  const config = await response.json();
+  return transformConfig(config);
 }
 
 export default async function Home() {
