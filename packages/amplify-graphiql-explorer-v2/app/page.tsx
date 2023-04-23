@@ -1,4 +1,4 @@
-import { AmplifyGraphiQL } from './AmplifyGraphiQL';
+import AmplifyGraphiQL from './AmplifyGraphiQL';
 import { AUTH_PROVIDER_TYPE, AUTH_PROVIDER_NAME, DEFAULT_API_CONFIG } from '@/support/constants';
 import styles from './page.module.css';
 import type { AmplifyAppSyncSimulatorApiConfig, AmplifyGraphQLConfig, AmplifyGraphQLAuthProviderType } from '@/support/types';

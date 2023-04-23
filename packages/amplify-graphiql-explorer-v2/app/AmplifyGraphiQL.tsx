@@ -1,9 +1,15 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { AmplifyAuthProvider } from '@/plugins/use-amplify-auth';
 import { AmplifyApiConfigProvider } from '@/support/use-amplify-api-config';
-import { Editor } from './Editor';
 import type { EditorProps } from './Editor';
 import type { AmplifyGraphQLConfig } from '@/support/types';
+
+const Editor = dynamic(() => import('./Editor'), {
+  /** @todo branded splash screen? */
+  loading: () => <p>Loading...</p>,
+  ssr: false,
+});
 
 export type AmplifyGraphiQLProps = {
   apiConfig: AmplifyGraphQLConfig;
@@ -18,3 +24,5 @@ export function AmplifyGraphiQL(props: AmplifyGraphiQLProps) {
     </AmplifyApiConfigProvider>
   );
 }
+
+export default AmplifyGraphiQL;

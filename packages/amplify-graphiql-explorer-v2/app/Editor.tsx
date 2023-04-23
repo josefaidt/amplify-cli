@@ -1,11 +1,10 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { GraphiQL } from 'graphiql';
 import { useExplorerPlugin } from '@graphiql/plugin-explorer';
 import { useAmplifyAuthPlugin } from '@/plugins/graphiql-plugin-amplify-auth';
 import { useAmplifyAuth } from '@/plugins/use-amplify-auth';
 import { createAmplifyMockApiFetcher } from '@/support/create-amplify-mock-api-fetcher';
-import { useAmplifyApiConfig } from '@/support/use-amplify-api-config';
 import styles from './Editor.module.css';
 
 export type EditorProps = {
@@ -13,7 +12,6 @@ export type EditorProps = {
 };
 
 export function Editor(props: EditorProps) {
-  const [amplifyApiConfig] = useAmplifyApiConfig();
   const [amplifyAuth] = useAmplifyAuth();
   const [query, setQuery] = useState('');
 
@@ -34,3 +32,5 @@ export function Editor(props: EditorProps) {
     </div>
   );
 }
+
+export default Editor;
