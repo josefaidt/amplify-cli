@@ -1,5 +1,5 @@
 import { AmplifyGraphiQL } from './AmplifyGraphiQL';
-import { AUTH_PROVIDER_TYPE, AUTH_PROVIDER_NAME } from '@/support/constants';
+import { AUTH_PROVIDER_TYPE, AUTH_PROVIDER_NAME, DEFAULT_API_CONFIG } from '@/support/constants';
 import styles from './page.module.css';
 import type { AmplifyAppSyncSimulatorApiConfig, AmplifyGraphQLConfig, AmplifyGraphQLAuthProviderType } from '@/support/types';
 
@@ -11,7 +11,7 @@ function transformConfig(config: AmplifyAppSyncSimulatorApiConfig): AmplifyGraph
     apiKey,
     authAccessKeyId,
     authRoleName,
-    unauthRoleName,
+    unAuthRoleName,
     accountId,
   } = config;
 
@@ -32,11 +32,12 @@ function transformConfig(config: AmplifyAppSyncSimulatorApiConfig): AmplifyGraph
       };
     }),
     credentials: {
+      ...DEFAULT_API_CONFIG.credentials,
       accessKeyId: authAccessKeyId,
       accountId,
       apiKey,
       authRoleName,
-      unauthRoleName,
+      unauthRoleName: unAuthRoleName,
     },
   };
 }

@@ -22,6 +22,7 @@ export function Editor(props: EditorProps) {
   // create Amplify auth plugin for GraphiQL
   const amplifyAuthPlugin = useAmplifyAuthPlugin({
     providers: amplifyApiConfig.providers,
+    credentials: amplifyApiConfig.credentials,
   });
   // create Explorer plugin for GraphiQL
   const explorerPlugin = useExplorerPlugin({

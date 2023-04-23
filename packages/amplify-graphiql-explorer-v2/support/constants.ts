@@ -28,6 +28,16 @@ export const AUTH_PROVIDER_NAME = {
   AWS_IAM: 'IAM',
 } as const;
 
+export const CREDENTIAL_NAMES = {
+  accountId: 'Account ID',
+  accessKeyId: 'Access Key ID',
+  apiKey: 'API Key',
+  authRoleName: 'Auth Role Name',
+  unauthRoleName: 'Unauth Role Name',
+  cognitoJwtToken: 'Cognito JWT Token',
+  oidcJwtToken: 'OIDC JWT Token',
+} as const;
+
 export const DEFAULT_API_CONFIG: Readonly<AmplifyGraphQLConfig> = {
   name: 'AmplifyGraphQLApi',
   providers: [

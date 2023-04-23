@@ -1,16 +1,28 @@
-import { PropsWithChildren, createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 import { DEFAULT_API_CONFIG } from '@/support/constants';
 import { getDefaultAuthProvider } from '@/support/get-default-auth-provider';
+import type { PropsWithChildren } from 'react';
 import type { AmplifyGraphQLAuthProviderType, AmplifyGraphQLConfigCredentials } from '@/support/types';
 
 export const AMPLIFY_AUTH_ACTION = {
   UPDATE: 'UPDATE',
+  UPDATE_PROVIDER: 'UPDATE_PROVIDER',
+  UPDATE_CREDENTIALS: 'UPDATE_CREDENTIALS',
 } as const;
 
-type AmplifyAuthAction = {
-  type: typeof AMPLIFY_AUTH_ACTION.UPDATE;
-  payload: Partial<AmplifyGraphQLAuthState>;
-};
+type AmplifyAuthAction =
+  | {
+      type: typeof AMPLIFY_AUTH_ACTION.UPDATE;
+      payload: Partial<AmplifyGraphQLAuthState>;
+    }
+  | {
+      type: typeof AMPLIFY_AUTH_ACTION.UPDATE_PROVIDER;
+      payload: AmplifyGraphQLAuthProviderType;
+    }
+  | {
+      type: typeof AMPLIFY_AUTH_ACTION.UPDATE_CREDENTIALS;
+      payload: Partial<AmplifyGraphQLConfigCredentials>;
+    };
 
 type AmplifyGraphQLAuthState = {
   provider: AmplifyGraphQLAuthProviderType;
@@ -27,13 +39,25 @@ const AmplifyAuthContextDispatch = createContext<React.Dispatch<AmplifyAuthActio
   throw new Error('AmplifyAuthContextDispatch not initialized');
 });
 
-function reducer(state: AmplifyGraphQLAuthState, action: AmplifyAuthAction) {
+function reducer(state: AmplifyGraphQLAuthState, action: AmplifyAuthAction): AmplifyGraphQLAuthState {
   switch (action.type) {
     case AMPLIFY_AUTH_ACTION.UPDATE: {
       return { ...state, ...action.payload };
     }
+    case AMPLIFY_AUTH_ACTION.UPDATE_PROVIDER: {
+      return { ...state, provider: action.payload };
+    }
+    case AMPLIFY_AUTH_ACTION.UPDATE_CREDENTIALS: {
+      return {
+        ...state,
+        credentials: {
+          ...state.credentials,
+          ...action.payload,
+        },
+      };
+    }
     default: {
-      throw new Error(`Unhandled type: ${action.type}`);
+      throw new Error(`Unhandled action`);
     }
   }
 }
@@ -48,6 +72,9 @@ type AmplifyAuthProviderProps = PropsWithChildren<{
 export function AmplifyAuthProvider(props: AmplifyAuthProviderProps) {
   const { children, initial } = props;
   const [auth, dispatch] = useReducer(reducer, initial || DEFAULT_AUTH_STATE);
+  useEffect(() => {
+    console.log({ auth });
+  }, [auth]);
   return (
     <AmplifyAuthContextState.Provider value={auth}>
       <AmplifyAuthContextDispatch.Provider value={dispatch}>{children}</AmplifyAuthContextDispatch.Provider>
