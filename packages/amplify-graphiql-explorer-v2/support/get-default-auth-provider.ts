@@ -8,5 +8,5 @@ export function getDefaultAuthProvider(providers: AmplifyGraphQLAuthProviderConf
   if (!defaultProvider) {
     throw new Error('No default authentication provider');
   }
-  return defaultProvider;
+  return defaultProvider.type;
 }
